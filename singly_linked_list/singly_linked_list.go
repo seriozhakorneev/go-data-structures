@@ -121,6 +121,9 @@ func main() {
 	intList.printList()
 
 	// delete 22 between 3 and 4
+	// need to know both node3 and node4 pointers to perform this
+	// otherwise we can delete whole list after selected one node
+	// intList.head.next.next = nil
 	intList.head.next.next = intList.head.next.next.next
 	intList.len--
 	intList.printList()
@@ -141,6 +144,9 @@ func main() {
 	strList.printList()
 
 	// delete "inserted" between node3 and node4
+	// need to know both node3 and node4 pointers to perform this
+	// otherwise we can delete whole list after selected one node
+	// strList.head.next.next = nil
 	strList.head.next.next = strList.head.next.next.next
 	strList.len--
 	strList.printList()
