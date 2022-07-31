@@ -1,5 +1,4 @@
-//package trees
-package main
+package trees
 
 import "fmt"
 
