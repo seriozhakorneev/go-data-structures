@@ -1,4 +1,4 @@
-package trees
+package simpletree
 
 import "fmt"
 
@@ -14,14 +14,6 @@ type tree[T any] struct {
 type node[T any] struct {
 	data      T
 	childrens []*node[T]
-}
-
-func (n *node[T]) addNode(data T) *node[T] {
-	n.childrens = append(
-		n.childrens,
-		&node[T]{data: data},
-	)
-	return n.childrens[len(n.childrens)-1]
 }
 
 func newTree[T any](rootData T) tree[T] {
@@ -55,6 +47,14 @@ func (t *tree[T]) printAll() {
 	if t.depth > 1 {
 		printRecursively(2, t.root.childrens)
 	}
+}
+
+func (n *node[T]) addNode(data T) *node[T] {
+	n.childrens = append(
+		n.childrens,
+		&node[T]{data: data},
+	)
+	return n.childrens[len(n.childrens)-1]
 }
 
 /*
