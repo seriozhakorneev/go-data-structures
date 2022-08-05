@@ -20,13 +20,13 @@ func newTree[T any](rootData T) tree[T] {
 	return tree[T]{
 		root:  &node[T]{data: rootData},
 		len:   1,
-		depth: 1,
+		depth: 0,
 	}
 }
 
 func (t *tree[T]) printAll() {
 
-	fmt.Printf("\nlen:%d depth:%d\n%d level nodes:\n %v", t.len, t.depth, 1, t.root.data)
+	fmt.Printf("\nlen:%d depth:%d\nrote node:\n %v", t.len, t.depth, t.root.data)
 
 	var printRecursively func(level int, nodes []*node[T])
 	printRecursively = func(level int, nodes []*node[T]) {
@@ -44,8 +44,8 @@ func (t *tree[T]) printAll() {
 		printRecursively(level+1, next)
 	}
 
-	if t.depth > 1 {
-		printRecursively(2, t.root.childrens)
+	if t.depth > 0 {
+		printRecursively(1, t.root.childrens)
 	}
 }
 
