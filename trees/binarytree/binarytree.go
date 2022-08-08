@@ -89,23 +89,26 @@ func generateSlice(from, to int) []int {
 // оптимизация узлов дерева для наиболее
 // оптимальной расстановки
 
+// TODO print tree func (not sure bout correct depth calc)
+// на основе обхода дерева
+
 func main() {
 	// creating new binary tree with range from 1 to 10
 	t := generateBTree(generateSlice(1, 12))
-	//TODO: print tree func (not sure bout correct depth calc)
-	//fmt.Println(t.root)
-	//fmt.Println(t.len)
+
+	fmt.Println(t.root.data)
+	fmt.Println(t.len)
 	fmt.Println(t.depth)
 
-	fmt.Println(t.root.left.data, "<--", t.root.data, "-->", t.root.right.data)
-	fmt.Println("--------------------")
-
-	fmt.Println(t.root.left.left.data, "<--", t.root.left.data, "-->", t.root.left.right.data)
-
-	fmt.Println("--------------------")
-	fmt.Println(t.root.right.left.data, "<--", t.root.right.data, "-->", t.root.right.right.data)
-
-	fmt.Println("--------------------")
-	fmt.Println(t.root.right.right.right, "<--", t.root.right.right.data, "-->", t.root.right.right.left)
+	//fmt.Println(t.root.left.data, "<--", t.root.data, "-->", t.root.right.data)
+	//fmt.Println("--------------------")
+	//
+	//fmt.Println(t.root.left.left.data, "<--", t.root.left.data, "-->", t.root.left.right.data)
+	//
+	//fmt.Println("--------------------")
+	//fmt.Println(t.root.right.left.data, "<--", t.root.right.data, "-->", t.root.right.right.data)
+	//
+	//fmt.Println("--------------------")
+	//fmt.Println(t.root.right.right.right, "<--", t.root.right.right.data, "-->", t.root.right.right.left)
 
 }
