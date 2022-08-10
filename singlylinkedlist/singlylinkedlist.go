@@ -4,21 +4,21 @@ import (
 	"fmt"
 )
 
-// singlyLinkedList represents a linked list
+// SinglyLinkedList represents a linked list
 // that holds values of any type.
-type singlyLinkedList[T any] struct {
-	head *node[T]
+type SinglyLinkedList[T any] struct {
+	head *Node[T]
 	len  int
 }
 
-// node represents a singly-linked node
+// Node represents a singly-linked Node
 // that holds values of any type.
-type node[T any] struct {
+type Node[T any] struct {
 	val  T
-	next *node[T]
+	next *Node[T]
 }
 
-func (l *singlyLinkedList[T]) append(v T) {
+func (l *SinglyLinkedList[T]) Append(v T) {
 	if l.head == nil {
 		return
 	}
@@ -33,7 +33,7 @@ func (l *singlyLinkedList[T]) append(v T) {
 	l.len++
 }
 
-func (l *node[T]) insert(v T) {
+func (l *Node[T]) Insert(v T) {
 	if l == nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (l *node[T]) insert(v T) {
 	l.next.next = tmp
 }
 
-func (l singlyLinkedList[T]) printList() {
+func (l *SinglyLinkedList[T]) PrintList() {
 	ptr := l.head
 	for {
 		ptr.printNode()
@@ -54,7 +54,7 @@ func (l singlyLinkedList[T]) printList() {
 	fmt.Println("len:", l.len)
 }
 
-func (l *node[T]) printNode() {
+func (l *Node[T]) printNode() {
 	if l == nil {
 		fmt.Print(nil)
 		return
@@ -69,18 +69,18 @@ func (l *node[T]) printNode() {
 		}())
 }
 
-func newList[T any]() *singlyLinkedList[T] {
-	return &singlyLinkedList[T]{
-		head: &node[T]{},
+func NewList[T any]() *SinglyLinkedList[T] {
+	return &SinglyLinkedList[T]{
+		head: &Node[T]{},
 		len:  0,
 	}
 }
 
-func addNode[T any](value T) *node[T] {
-	return &node[T]{val: value}
+func addNode[T any](value T) *Node[T] {
+	return &Node[T]{val: value}
 }
 
-func fillWithRange(l *singlyLinkedList[int], from, to int) {
+func FillWithRange(l *SinglyLinkedList[int], from, to int) {
 	l.head.val = from
 	l.len++
 	ptr := l.head
@@ -93,7 +93,7 @@ func fillWithRange(l *singlyLinkedList[int], from, to int) {
 	}
 }
 
-func fillWithStrings(l *singlyLinkedList[string], s ...string) {
+func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
 	l.head.val = s[0]
 	l.len++
 	ptr := l.head
@@ -122,7 +122,7 @@ func fillWithStrings(l *singlyLinkedList[string], s ...string) {
 
 	// delete 22 between 3 and 4
 	// need to know both 3 and 4 pointers to perform this
-	// otherwise we can delete whole list after selected node
+	// otherwise we can delete whole list after selected Node
 	// intList.head.next.next = nil
 	intList.head.next.next = intList.head.next.next.next
 	intList.len--
@@ -145,7 +145,7 @@ func fillWithStrings(l *singlyLinkedList[string], s ...string) {
 
 	// delete "inserted" between "node3" and "node4"
 	// need to know both "node3" and "node4" pointers to perform this
-	// otherwise we can delete whole list after selected node
+	// otherwise we can delete whole list after selected Node
 	// strList.head.next.next = nil
 	strList.head.next.next = strList.head.next.next.next
 	strList.len--
