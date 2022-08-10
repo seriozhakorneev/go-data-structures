@@ -25,7 +25,7 @@ func (l *SinglyLinkedList[T]) Append(v T) {
 	ptr := l.Head
 	for {
 		if ptr.Next == nil {
-			ptr.Next = addNode(v)
+			ptr.Next = AddNode(v)
 			break
 		}
 		ptr = ptr.Next
@@ -38,14 +38,14 @@ func (l *Node[T]) Insert(v T) {
 		return
 	}
 	tmp := l.Next
-	l.Next = addNode[T](v)
+	l.Next = AddNode[T](v)
 	l.Next.Next = tmp
 }
 
 func (l *SinglyLinkedList[T]) PrintList() {
 	ptr := l.Head
 	for {
-		ptr.printNode()
+		ptr.PrintNode()
 		if ptr.Next == nil {
 			break
 		}
@@ -54,7 +54,7 @@ func (l *SinglyLinkedList[T]) PrintList() {
 	fmt.Println("Len:", l.Len)
 }
 
-func (l *Node[T]) printNode() {
+func (l *Node[T]) PrintNode() {
 	if l == nil {
 		fmt.Print(nil)
 		return
@@ -76,7 +76,7 @@ func NewList[T any]() *SinglyLinkedList[T] {
 	}
 }
 
-func addNode[T any](value T) *Node[T] {
+func AddNode[T any](value T) *Node[T] {
 	return &Node[T]{Val: value}
 }
 
@@ -86,7 +86,23 @@ func FillWithRange(l *SinglyLinkedList[int], from, to int) {
 	ptr := l.Head
 	for i := from + 1; i <= to; i++ {
 		if ptr.Next == nil {
-			ptr.Next = addNode[int](i)
+			ptr.Next = AddNode[int](i)
+			l.Len++
+		}
+		ptr = ptr.Next
+	}
+}
+
+func FillWithInts(l *SinglyLinkedList[int], a ...int) {
+	if len(a) == 0 {
+		return
+	}
+	l.Head.Val = a[0]
+	l.Len++
+	ptr := l.Head
+	for _, el := range a[1:] {
+		if ptr.Next == nil {
+			ptr.Next = AddNode[int](el)
 			l.Len++
 		}
 		ptr = ptr.Next
@@ -94,12 +110,15 @@ func FillWithRange(l *SinglyLinkedList[int], from, to int) {
 }
 
 func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
+	if len(s) == 0 {
+		return
+	}
 	l.Head.Val = s[0]
 	l.Len++
 	ptr := l.Head
 	for _, el := range s[1:] {
 		if ptr.Next == nil {
-			ptr.Next = addNode[string](el)
+			ptr.Next = AddNode[string](el)
 			l.Len++
 		}
 		ptr = ptr.Next
