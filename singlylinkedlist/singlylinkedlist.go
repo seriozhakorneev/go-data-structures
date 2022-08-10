@@ -7,51 +7,51 @@ import (
 // SinglyLinkedList represents a linked list
 // that holds values of any type.
 type SinglyLinkedList[T any] struct {
-	head *Node[T]
-	len  int
+	Head *Node[T]
+	Len  int
 }
 
 // Node represents a singly-linked Node
 // that holds values of any type.
 type Node[T any] struct {
-	val  T
-	next *Node[T]
+	Val  T
+	Next *Node[T]
 }
 
 func (l *SinglyLinkedList[T]) Append(v T) {
-	if l.head == nil {
+	if l.Head == nil {
 		return
 	}
-	ptr := l.head
+	ptr := l.Head
 	for {
-		if ptr.next == nil {
-			ptr.next = addNode(v)
+		if ptr.Next == nil {
+			ptr.Next = addNode(v)
 			break
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
-	l.len++
+	l.Len++
 }
 
 func (l *Node[T]) Insert(v T) {
 	if l == nil {
 		return
 	}
-	tmp := l.next
-	l.next = addNode[T](v)
-	l.next.next = tmp
+	tmp := l.Next
+	l.Next = addNode[T](v)
+	l.Next.Next = tmp
 }
 
 func (l *SinglyLinkedList[T]) PrintList() {
-	ptr := l.head
+	ptr := l.Head
 	for {
 		ptr.printNode()
-		if ptr.next == nil {
+		if ptr.Next == nil {
 			break
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
-	fmt.Println("len:", l.len)
+	fmt.Println("Len:", l.Len)
 }
 
 func (l *Node[T]) printNode() {
@@ -60,10 +60,10 @@ func (l *Node[T]) printNode() {
 		return
 	}
 	fmt.Printf("%v->%v ",
-		l.val,
+		l.Val,
 		func() interface{} {
-			if l.next != nil {
-				return l.next.val
+			if l.Next != nil {
+				return l.Next.Val
 			}
 			return nil
 		}())
@@ -71,38 +71,38 @@ func (l *Node[T]) printNode() {
 
 func NewList[T any]() *SinglyLinkedList[T] {
 	return &SinglyLinkedList[T]{
-		head: &Node[T]{},
-		len:  0,
+		Head: &Node[T]{},
+		Len:  0,
 	}
 }
 
 func addNode[T any](value T) *Node[T] {
-	return &Node[T]{val: value}
+	return &Node[T]{Val: value}
 }
 
 func FillWithRange(l *SinglyLinkedList[int], from, to int) {
-	l.head.val = from
-	l.len++
-	ptr := l.head
+	l.Head.Val = from
+	l.Len++
+	ptr := l.Head
 	for i := from + 1; i <= to; i++ {
-		if ptr.next == nil {
-			ptr.next = addNode[int](i)
-			l.len++
+		if ptr.Next == nil {
+			ptr.Next = addNode[int](i)
+			l.Len++
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
 }
 
 func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
-	l.head.val = s[0]
-	l.len++
-	ptr := l.head
+	l.Head.Val = s[0]
+	l.Len++
+	ptr := l.Head
 	for _, el := range s[1:] {
-		if ptr.next == nil {
-			ptr.next = addNode[string](el)
-			l.len++
+		if ptr.Next == nil {
+			ptr.Next = addNode[string](el)
+			l.Len++
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
 }
 
@@ -116,16 +116,16 @@ func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
 	intList.printList()
 
 	// add 22 between 3 and 4
-	intList.head.next.next.insert(22)
-	intList.len++
+	intList.Head.Next.Next.insert(22)
+	intList.Len++
 	intList.printList()
 
 	// delete 22 between 3 and 4
 	// need to know both 3 and 4 pointers to perform this
 	// otherwise we can delete whole list after selected Node
-	// intList.head.next.next = nil
-	intList.head.next.next = intList.head.next.next.next
-	intList.len--
+	// intList.Head.Next.Next = nil
+	intList.Head.Next.Next = intList.Head.Next.Next.Next
+	intList.Len--
 	intList.printList()
 
 	fmt.Println("--------------")
@@ -139,15 +139,15 @@ func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
 	strList.printList()
 
 	// add "inserted" between node3 and node4
-	strList.head.next.insert("inserted")
-	strList.len++
+	strList.Head.Next.insert("inserted")
+	strList.Len++
 	strList.printList()
 
 	// delete "inserted" between "node3" and "node4"
 	// need to know both "node3" and "node4" pointers to perform this
 	// otherwise we can delete whole list after selected Node
-	// strList.head.next.next = nil
-	strList.head.next.next = strList.head.next.next.next
-	strList.len--
+	// strList.Head.Next.Next = nil
+	strList.Head.Next.Next = strList.Head.Next.Next.Next
+	strList.Len--
 	strList.printList()
 */
