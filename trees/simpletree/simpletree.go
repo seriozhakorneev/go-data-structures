@@ -26,7 +26,7 @@ func NewTree[T any](rootData T) Tree[T] {
 
 func (t *Tree[T]) PrintAll() {
 
-	fmt.Printf("\nlen:%d Depth:%d\nrote Node:\n %v", t.Len, t.Depth, t.Root.Data)
+	fmt.Printf("\nlen:%d Depth:%d\nroot Node:\n %v", t.Len, t.Depth, t.Root.Data)
 
 	var printRec func(level int, nodes []*Node[T])
 	printRec = func(level int, nodes []*Node[T]) {
