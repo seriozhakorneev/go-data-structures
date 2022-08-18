@@ -2,101 +2,101 @@ package simpletree
 
 import "fmt"
 
-// tree represents a tree
+// Tree represents a Tree
 // that holds values of any type.
-type tree[T any] struct {
-	root       *node[T]
-	len, depth int
+type Tree[T any] struct {
+	Root       *Node[T]
+	Len, Depth int
 }
 
-// node represents a tree node
+// Node represents a Tree Node
 // that holds values of any type.
-type node[T any] struct {
-	data      T
-	childrens []*node[T]
+type Node[T any] struct {
+	Data      T
+	Childrens []*Node[T]
 }
 
-func newTree[T any](rootData T) tree[T] {
-	return tree[T]{
-		root:  &node[T]{data: rootData},
-		len:   1,
-		depth: 0,
+func NewTree[T any](rootData T) Tree[T] {
+	return Tree[T]{
+		Root:  &Node[T]{Data: rootData},
+		Len:   1,
+		Depth: 0,
 	}
 }
 
-func (t *tree[T]) printAll() {
+func (t *Tree[T]) PrintAll() {
 
-	fmt.Printf("\nlen:%d depth:%d\nrote node:\n %v", t.len, t.depth, t.root.data)
+	fmt.Printf("\nlen:%d Depth:%d\nrote Node:\n %v", t.Len, t.Depth, t.Root.Data)
 
-	var printRecursively func(level int, nodes []*node[T])
-	printRecursively = func(level int, nodes []*node[T]) {
+	var printRec func(level int, nodes []*Node[T])
+	printRec = func(level int, nodes []*Node[T]) {
 
 		fmt.Printf("\n%d level nodes:\n", level)
-		var next []*node[T]
+		var next []*Node[T]
 		for _, n := range nodes {
-			fmt.Print(" ", n.data)
-			next = append(next, n.childrens...)
+			fmt.Print(" ", n.Data)
+			next = append(next, n.Childrens...)
 		}
 
-		if level == t.depth {
+		if level == t.Depth {
 			return
 		}
-		printRecursively(level+1, next)
+		printRec(level+1, next)
 	}
 
-	if t.depth > 0 {
-		printRecursively(1, t.root.childrens)
+	if t.Depth > 0 {
+		printRec(1, t.Root.Childrens)
 	}
 }
 
-func (n *node[T]) addNode(data T) *node[T] {
-	n.childrens = append(
-		n.childrens,
-		&node[T]{data: data},
+func (n *Node[T]) AddNode(data T) *Node[T] {
+	n.Childrens = append(
+		n.Childrens,
+		&Node[T]{Data: data},
 	)
-	return n.childrens[len(n.childrens)-1]
+	return n.Childrens[len(n.Childrens)-1]
 }
 
 /*
-	// making tree with root node and string "root" in data
-	t := newTree("root")
+	// making Tree with Root Node and string "Root" in Data
+	t := newTree("Root")
 
-	// add node to root
-	children1 := t.root.addNode("children1")
-	// inc depth
-	t.depth++
-	// inc len
-	t.len++
+	// add Node to Root
+	children1 := t.Root.addNode("children1")
+	// inc Depth
+	t.Depth++
+	// inc Len
+	t.Len++
 
-	// add nodes to children1(root-children1)
+	// add nodes to children1(Root-children1)
 	children1.addNode("children1-1")
-	t.depth++
-	t.len++
+	t.Depth++
+	t.Len++
 
 	children1.addNode("children1-2")
-	t.len++
+	t.Len++
 
 	children1.addNode("children1-3")
-	t.len++
+	t.Len++
 
-	// add 2 more child to root
-	t.root.addNode("children2")
-	t.len++
-	children3 := t.root.addNode("children3")
-	t.len++
+	// add 2 more child to Root
+	t.Root.addNode("children2")
+	t.Len++
+	children3 := t.Root.addNode("children3")
+	t.Len++
 
-	// add 2 child to children3(root-children3)
+	// add 2 child to children3(Root-children3)
 	children3.addNode("children3-1")
-	t.len++
+	t.Len++
 	children3.addNode("children3-2")
-	t.len++
+	t.Len++
 
 	children4 := children3.addNode("children3-2")
-	t.len++
+	t.Len++
 
 	children4.addNode("children3-2-1")
-	t.len++
-	t.depth++
+	t.Len++
+	t.Depth++
 
 	t.printAll()
 */
