@@ -2,102 +2,102 @@ package stack
 
 import "fmt"
 
-type stack[T any] struct {
-	st            []T
-	capacity, len int
+type Stack[T any] struct {
+	St            []T
+	Capacity, Len int
 }
 
-func (s stack[T]) String() string {
+func (s Stack[T]) String() string {
 	return fmt.Sprintf(
-		"%v, len(%v), cap(%v)",
-		s.st, s.len, s.capacity,
+		"%v, Len(%v), cap(%v)",
+		s.St, s.Len, s.Capacity,
 	)
 }
 
-// provide 0 capacity to make stack capacity infinite
-func newStack[T any](capacity int) stack[T] {
-	return stack[T]{capacity: capacity}
+// New provide 0 Capacity to make Stack Capacity infinite
+func New[T any](capacity int) Stack[T] {
+	return Stack[T]{Capacity: capacity}
 }
 
-func (s stack[T]) isEmpty() bool {
-	return s.len == 0
+func (s Stack[T]) IsEmpty() bool {
+	return s.Len == 0
 }
 
-func (s *stack[T]) isFull() bool {
-	if s.len < s.capacity || s.capacity == 0 {
+func (s *Stack[T]) IsFull() bool {
+	if s.Len < s.Capacity || s.Capacity == 0 {
 		return false
 	}
 	return true
 }
 
-func (s stack[T]) size() int {
-	return s.len
+func (s Stack[T]) Size() int {
+	return s.Len
 }
 
-func (s stack[T]) top() (T, bool) {
-	if s.isEmpty() {
+func (s Stack[T]) Top() (T, bool) {
+	if s.IsEmpty() {
 		var zero T
 		return zero, false
 	}
 
-	return s.st[len(s.st)-1], true
+	return s.St[len(s.St)-1], true
 }
 
-func (s *stack[T]) push(element T) bool {
-	if !s.isFull() {
-		s.st = append(s.st, element)
-		s.len++
+func (s *Stack[T]) Push(element T) bool {
+	if !s.IsFull() {
+		s.St = append(s.St, element)
+		s.Len++
 		return true
 	}
 	return false
 }
 
-func (s *stack[T]) pop() (T, bool) {
-	if s.isEmpty() {
+func (s *Stack[T]) Pop() (T, bool) {
+	if s.IsEmpty() {
 		var zero T
 		return zero, false
 	}
 
-	element := s.st[len(s.st)-1]
-	s.st = (s.st)[:len(s.st)-1]
-	s.len--
+	element := s.St[len(s.St)-1]
+	s.St = (s.St)[:len(s.St)-1]
+	s.Len--
 	return element, true
 }
 
-// new stack with capacity 3
-//st := newStack[string](3)
-//fmt.Println("is empty:", st.isEmpty())
-//fmt.Println(st)
+// new Stack with Capacity 3
+//St := New[string](3)
+//fmt.Println("is empty:", St.IsEmpty())
+//fmt.Println(St)
 //
 //fmt.Println(
 //	"pushing",
-//	st.push("1"),
-//	st.push("2"),
-//	st.push("3"),
-//	st.push("4"),
+//	St.Push("1"),
+//	St.Push("2"),
+//	St.Push("3"),
+//	St.Push("4"),
 //)
 //
-//fmt.Println("is empty:", st.isEmpty())
-//fmt.Println(st)
+//fmt.Println("is empty:", St.IsEmpty())
+//fmt.Println(St)
 //
-//top, _ := st.top()
-//fmt.Println("top:", top)
-//fmt.Println("size:", st.size())
+//Top, _ := St.Top()
+//fmt.Println("Top:", Top)
+//fmt.Println("Size:", St.Size())
 //
-//if el, ok := st.pop(); ok {
-//	fmt.Println("pop el:", el)
+//if el, ok := St.Pop(); ok {
+//	fmt.Println("Pop el:", el)
 //}
-//if el, ok := st.pop(); ok {
-//	fmt.Println("pop el:", el)
-//}
-//
-//if el, ok := st.top(); ok {
-//	fmt.Println("top:", el)
+//if el, ok := St.Pop(); ok {
+//	fmt.Println("Pop el:", el)
 //}
 //
-//if el, ok := st.pop(); ok {
-//	fmt.Println("pop el:", el)
+//if el, ok := St.Top(); ok {
+//	fmt.Println("Top:", el)
 //}
 //
-//fmt.Println("size:", st.size())
-//fmt.Println(st.isEmpty(), st)
+//if el, ok := St.Pop(); ok {
+//	fmt.Println("Pop el:", el)
+//}
+//
+//fmt.Println("Size:", St.Size())
+//fmt.Println(St.IsEmpty(), St)

@@ -131,21 +131,31 @@ func calcDepth(a []int) int {
 
 func main() {
 	// creating new binary tree with range from 1 to 10
-	//t := GenerateFromRange(1, 12)
-
-	//fmt.Println(t.Root.Data)
-	//fmt.Println(t.Len)
-	//fmt.Println(t.Depth)
-
+	//t := NewTree("F")
+	//
+	//t.Root.Left = &Node[string]{Data: "B"}
+	//t.Root.Left.Left = &Node[string]{Data: "A"}
+	//t.Root.Left.Right = &Node[string]{Data: "D"}
+	//t.Root.Left.Right.Left = &Node[string]{Data: "C"}
+	//t.Root.Left.Right.Right = &Node[string]{Data: "E"}
+	//
+	//t.Root.Right = &Node[string]{Data: "G"}
+	//t.Root.Right.Right = &Node[string]{Data: "I"}
+	//t.Root.Right.Right.Left = &Node[string]{Data: "H"}
+	//
 	//fmt.Println(t.Root.Left.Data, "<--", t.Root.Data, "-->", t.Root.Right.Data)
 	//fmt.Println("--------------------")
 	//
 	//fmt.Println(t.Root.Left.Left.Data, "<--", t.Root.Left.Data, "-->", t.Root.Left.Right.Data)
 	//
 	//fmt.Println("--------------------")
-	//fmt.Println(t.Root.Right.Left.Data, "<--", t.Root.Right.Data, "-->", t.Root.Right.Right.Data)
+	//fmt.Println(t.Root.Right.Left, "<--", t.Root.Right.Data, "-->", t.Root.Right.Right.Data)
 	//
 	//fmt.Println("--------------------")
-	//fmt.Println(t.Root.Right.Right.Right, "<--", t.Root.Right.Right.Data, "-->", t.Root.Right.Right.Left)
+	//fmt.Println(t.Root.Right.Right.Left.Data, "<--", t.Root.Right.Right.Data, "-->", t.Root.Right.Right.Right)
+
+	// LEFT
+	// VISIT
+	// RIGHT
 
 }
