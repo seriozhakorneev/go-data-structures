@@ -57,46 +57,24 @@ func (n *Node[T]) AddNode(data T) *Node[T] {
 	return n.Childrens[len(n.Childrens)-1]
 }
 
-/*
-	// making Tree with Root Node and string "Root" in Data
-	t := newTree("Root")
+func (t *Tree[T]) FindDepth() int {
+	var find func(node *Node[T]) int
+	find = func(node *Node[T]) int {
+		if node == nil {
+			return 0
+		}
 
-	// add Node to Root
-	children1 := t.Root.addNode("children1")
-	// inc Depth
-	t.Depth++
-	// inc Len
-	t.Len++
+		maxDepth := 0
+		for _, children := range node.Childrens {
+			depth := find(children)
+			if depth > maxDepth {
+				maxDepth = depth
+			}
+		}
 
-	// add nodes to children1(Root-children1)
-	children1.addNode("children1-1")
-	t.Depth++
-	t.Len++
+		return maxDepth + 1
+	}
 
-	children1.addNode("children1-2")
-	t.Len++
-
-	children1.addNode("children1-3")
-	t.Len++
-
-	// add 2 more child to Root
-	t.Root.addNode("children2")
-	t.Len++
-	children3 := t.Root.addNode("children3")
-	t.Len++
-
-	// add 2 child to children3(Root-children3)
-	children3.addNode("children3-1")
-	t.Len++
-	children3.addNode("children3-2")
-	t.Len++
-
-	children4 := children3.addNode("children3-2")
-	t.Len++
-
-	children4.addNode("children3-2-1")
-	t.Len++
-	t.Depth++
-
-	t.printAll()
-*/
+	t.Depth = find(t.Root)
+	return t.Depth
+}

@@ -85,8 +85,7 @@ func generateSlice(from, to int) []int {
 	return a
 }
 
-// TODO maybe incorrect
-
+// CalcDepth maybe incorrect
 func CalcDepth(a []int) int {
 	if len(a) > 2 {
 		depth := float64(len(a)) / float64(2)
@@ -96,6 +95,26 @@ func CalcDepth(a []int) int {
 		return int(depth)
 	}
 	return len(a)
+}
+
+func (t *Tree[T]) FindDepth() int {
+	var find func(node *Node[T]) int
+	find = func(node *Node[T]) int {
+		if node == nil {
+			return 0
+		}
+
+		lDepth := find(node.Left)
+		rDepth := find(node.Right)
+
+		if lDepth > rDepth {
+			return lDepth + 1
+		}
+		return rDepth + 1
+	}
+
+	t.Depth = find(t.Root)
+	return t.Depth
 }
 
 // TODO tree balancing method
