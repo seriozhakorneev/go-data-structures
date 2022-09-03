@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-// SinglyLinkedList represents a linked list
+// List represents a singly linked list
 // that holds values of any type.
-type SinglyLinkedList[T any] struct {
+type List[T any] struct {
 	Head *Node[T]
 	Len  int
 }
@@ -18,7 +18,7 @@ type Node[T any] struct {
 	Next *Node[T]
 }
 
-func (l *SinglyLinkedList[T]) Append(v T) {
+func (l *List[T]) Append(v T) {
 	if l.Head == nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (l *Node[T]) Insert(v T) {
 	l.Next.Next = tmp
 }
 
-func (l *SinglyLinkedList[T]) PrintList() {
+func (l *List[T]) PrintList() {
 	ptr := l.Head
 	for {
 		ptr.PrintNode()
@@ -69,8 +69,8 @@ func (l *Node[T]) PrintNode() {
 		}())
 }
 
-func NewList[T any]() *SinglyLinkedList[T] {
-	return &SinglyLinkedList[T]{
+func NewList[T any]() *List[T] {
+	return &List[T]{
 		Head: &Node[T]{},
 		Len:  0,
 	}
@@ -80,7 +80,7 @@ func AddNode[T any](value T) *Node[T] {
 	return &Node[T]{Val: value}
 }
 
-func FillWithRange(l *SinglyLinkedList[int], from, to int) {
+func FillWithRange(l *List[int], from, to int) {
 	l.Head.Val = from
 	l.Len++
 	ptr := l.Head
@@ -93,7 +93,7 @@ func FillWithRange(l *SinglyLinkedList[int], from, to int) {
 	}
 }
 
-func FillWithInts(l *SinglyLinkedList[int], a ...int) {
+func FillWithInts(l *List[int], a ...int) {
 	if len(a) == 0 {
 		return
 	}
@@ -109,7 +109,7 @@ func FillWithInts(l *SinglyLinkedList[int], a ...int) {
 	}
 }
 
-func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
+func FillWithStrings(l *List[string], s ...string) {
 	if len(s) == 0 {
 		return
 	}
@@ -124,49 +124,3 @@ func FillWithStrings(l *SinglyLinkedList[string], s ...string) {
 		ptr = ptr.Next
 	}
 }
-
-/*
-	intList := newList[int]()
-	fillWithRange(intList, 1, 10)
-	intList.printList()
-
-	// append 11 to the end of the list
-	intList.append(11)
-	intList.printList()
-
-	// add 22 between 3 and 4
-	intList.Head.Next.Next.insert(22)
-	intList.Len++
-	intList.printList()
-
-	// delete 22 between 3 and 4
-	// need to know both 3 and 4 pointers to perform this
-	// otherwise we can delete whole list after selected Node
-	// intList.Head.Next.Next = nil
-	intList.Head.Next.Next = intList.Head.Next.Next.Next
-	intList.Len--
-	intList.printList()
-
-	fmt.Println("--------------")
-
-	strList := newList[string]()
-	fillWithStrings(strList, []string{"node1", "node2", "node3", "node4", "node5", "node6"}...)
-	strList.printList()
-
-	// append "node7" to the end of the list
-	strList.append("node7")
-	strList.printList()
-
-	// add "inserted" between node3 and node4
-	strList.Head.Next.insert("inserted")
-	strList.Len++
-	strList.printList()
-
-	// delete "inserted" between "node3" and "node4"
-	// need to know both "node3" and "node4" pointers to perform this
-	// otherwise we can delete whole list after selected Node
-	// strList.Head.Next.Next = nil
-	strList.Head.Next.Next = strList.Head.Next.Next.Next
-	strList.Len--
-	strList.printList()
-*/
