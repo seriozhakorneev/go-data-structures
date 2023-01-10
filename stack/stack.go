@@ -7,7 +7,7 @@ type Stack[T any] struct {
 	Capacity, Len int
 }
 
-func (s Stack[T]) String() string {
+func (s *Stack[T]) String() string {
 	return fmt.Sprintf(
 		"%v, Len(%v), cap(%v)",
 		s.St, s.Len, s.Capacity,
@@ -19,7 +19,7 @@ func New[T any](capacity int) Stack[T] {
 	return Stack[T]{Capacity: capacity}
 }
 
-func (s Stack[T]) IsEmpty() bool {
+func (s *Stack[T]) IsEmpty() bool {
 	return s.Len == 0
 }
 
@@ -30,11 +30,11 @@ func (s *Stack[T]) IsFull() bool {
 	return true
 }
 
-func (s Stack[T]) Size() int {
+func (s *Stack[T]) Size() int {
 	return s.Len
 }
 
-func (s Stack[T]) Top() (T, bool) {
+func (s *Stack[T]) Top() (T, bool) {
 	if s.IsEmpty() {
 		var zero T
 		return zero, false

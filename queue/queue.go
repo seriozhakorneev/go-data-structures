@@ -7,7 +7,7 @@ type Queue[T any] struct {
 	Capacity, Len int
 }
 
-func (q Queue[T]) String() string {
+func (q *Queue[T]) String() string {
 	for i := q.Len - 1; i > -1; i-- {
 		fmt.Print(q.Qu[i], " ")
 	}
@@ -23,7 +23,7 @@ func New[T any](capacity int) Queue[T] {
 	return Queue[T]{Capacity: capacity}
 }
 
-func (q Queue[T]) IsEmpty() bool {
+func (q *Queue[T]) IsEmpty() bool {
 	return q.Len == 0
 }
 
@@ -34,11 +34,11 @@ func (q *Queue[T]) IsFull() bool {
 	return true
 }
 
-func (q Queue[T]) Size() int {
+func (q *Queue[T]) Size() int {
 	return q.Len
 }
 
-func (q Queue[T]) Front() (T, bool) {
+func (q *Queue[T]) Front() (T, bool) {
 	if q.IsEmpty() {
 		var zero T
 		return zero, false

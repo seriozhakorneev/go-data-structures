@@ -25,99 +25,38 @@ func NewTree[T any](rootData T) Tree[T] {
 	}
 }
 
-func GenerateFromRange(from, to int) Tree[int] {
-	a := generateSlice(from, to)
-	// get median index of array
-	// set it to tree Root
-	m := medianIndex(len(a))
-	t := NewTree(a[m])
-	f, s := a[:m], a[m+1:]
-
-	if len(f) > len(s) {
-		t.Depth = CalcDepth(f)
-	}
-	t.Depth = CalcDepth(s)
-
-	t.Root.Left = generateNode(f, &t.Len)
-	t.Root.Right = generateNode(s, &t.Len)
-	return t
+func (n *Node[T]) AddLeft(val T) *Node[T] {
+	left := &Node[T]{Data: val}
+	n.Left = left
+	return left
 }
 
-func GenerateFromSlice(a []int) Tree[int] {
-	// get median index of array
-	// set it to tree Root
-	m := medianIndex(len(a))
-	t := NewTree(a[m])
-	f, s := a[:m], a[m+1:]
-
-	if len(f) > len(s) {
-		t.Depth = CalcDepth(f)
-	}
-	t.Depth = CalcDepth(s)
-
-	t.Root.Left = generateNode(f, &t.Len)
-	t.Root.Right = generateNode(s, &t.Len)
-	return t
+func (n *Node[T]) AddRight(val T) *Node[T] {
+	right := &Node[T]{Data: val}
+	n.Right = right
+	return right
 }
 
-func generateNode(a []int, length *int) *Node[int] {
-	m := medianIndex(len(a))
-	if m == -1 {
-		return nil
-	}
-	*length++
-	return &Node[int]{
-		Data:  a[m],
-		Left:  generateNode(a[:m], length),
-		Right: generateNode(a[m+1:], length),
-	}
-}
+func (t *Tree[T]) CalcDepNLen() {
+	var rec func(node *Node[T], depth int) int
 
-func medianIndex(length int) int {
-	return (length+1)/2 - 1
-}
-
-func generateSlice(from, to int) []int {
-	var a []int
-	for i := from; i <= to; i++ {
-		a = append(a, i)
-	}
-	return a
-}
-
-// CalcDepth maybe incorrect
-func CalcDepth(a []int) int {
-	if len(a) > 2 {
-		depth := float64(len(a)) / float64(2)
-		if depth/10 != 0 {
-			depth++
-		}
-		return int(depth)
-	}
-	return len(a)
-}
-
-func (t *Tree[T]) FindDepth() int {
-	var find func(node *Node[T]) int
-	find = func(node *Node[T]) int {
+	rec = func(node *Node[T], depth int) int {
 		if node == nil {
-			return 0
+			return depth
 		}
+		t.Len++
+		depth++
 
-		lDepth := find(node.Left)
-		rDepth := find(node.Right)
+		lDepth := rec(node.Left, depth)
+		rDepth := rec(node.Right, depth)
 
 		if lDepth > rDepth {
-			return lDepth + 1
+			return lDepth
 		}
-		return rDepth + 1
+		return rDepth
 	}
 
-	t.Depth = find(t.Root)
-	return t.Depth
+	t.Depth += rec(t.Root, t.Depth)
+	t.Depth--
+	t.Len--
 }
-
-// TODO tree balancing method
-// нужен при добавлении к дереву элемента
-// оптимизация узлов дерева для наиболее
-// оптимальной расстановки
