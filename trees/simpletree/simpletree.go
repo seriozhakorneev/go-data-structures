@@ -24,9 +24,21 @@ func NewTree[T any](rootData T) Tree[T] {
 	}
 }
 
-func (t *Tree[T]) PrintAll() {
+func (n *Node[T]) AddNode(data T) *Node[T] {
+	n.Childrens = append(
+		n.Childrens,
+		&Node[T]{Data: data},
+	)
+	return n.Childrens[len(n.Childrens)-1]
+}
 
-	fmt.Printf("\nlen:%d Depth:%d\nroot Node:\n %v", t.Len, t.Depth, t.Root.Data)
+func (t *Tree[T]) PrintAll() {
+	fmt.Printf(
+		"\nlen:%d Depth:%d\nroot Node:\n %v",
+		t.Len,
+		t.Depth,
+		t.Root.Data,
+	)
 
 	var printRec func(level int, nodes []*Node[T])
 	printRec = func(level int, nodes []*Node[T]) {
@@ -47,14 +59,6 @@ func (t *Tree[T]) PrintAll() {
 	if t.Depth > 0 {
 		printRec(1, t.Root.Childrens)
 	}
-}
-
-func (n *Node[T]) AddNode(data T) *Node[T] {
-	n.Childrens = append(
-		n.Childrens,
-		&Node[T]{Data: data},
-	)
-	return n.Childrens[len(n.Childrens)-1]
 }
 
 func (t *Tree[T]) FindDepth() int {
