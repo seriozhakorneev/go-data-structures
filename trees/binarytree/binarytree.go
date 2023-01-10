@@ -57,5 +57,6 @@ func (t *Tree[T]) CalcDepNLen() {
 	}
 
 	t.Depth += rec(t.Root, t.Depth)
+	t.Depth--
 	t.Len--
 }

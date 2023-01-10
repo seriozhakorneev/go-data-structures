@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -135,7 +136,8 @@ func CalcDepth(a []int) int {
 // оптимальной расстановки
 
 func main() {
-
 	tree := GenerateFromSlice([]int{1, 2, 3, 4, 5})
+
+	fmt.Println(tree.Depth, tree.Len)
 
 }
