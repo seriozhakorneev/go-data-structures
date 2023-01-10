@@ -1,4 +1,4 @@
-package binarytree
+package main
 
 // Tree represents a binary tree
 // that holds values of any type.

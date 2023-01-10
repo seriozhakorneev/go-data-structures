@@ -124,17 +124,3 @@ func FillWithStrings(l *List[string], s ...string) {
 		ptr = ptr.Next
 	}
 }
-
-// TODO: better do it this way, accepts &Node{}, returns root
-//func generateLinkedList(node *Node, a []int) *Node {
-//	if len(a) == 0 {
-//		return nil
-//	}
-//
-//	return &Node{
-//		val: a[0],
-//		next: generateLinkedList(
-//			&Node{val: node.val},
-//			a[1:]),
-//	}
-//}

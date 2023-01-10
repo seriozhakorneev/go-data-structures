@@ -44,7 +44,7 @@ func (l *Node[T]) Insert(v T) {
 	l.next.next.prev = l.next
 }
 
-func (l List[T]) PrintList() {
+func (l *List[T]) PrintList() {
 	ptr := l.head
 	for {
 		ptr.Print()
@@ -78,7 +78,7 @@ func (l *Node[T]) Print() {
 	)
 }
 
-func (l List[T]) PrintListReversed() {
+func (l *List[T]) PrintListReversed() {
 	ptr := l.tail
 	for {
 		ptr.PrintNodeReversed()
