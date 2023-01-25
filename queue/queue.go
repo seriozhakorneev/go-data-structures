@@ -13,7 +13,7 @@ func (q *Queue[T]) String() string {
 	}
 
 	return fmt.Sprintf(
-		"Len(%v), cap(%v)",
+		"Length(%v), cap(%v)",
 		q.Len, q.Capacity,
 	)
 }
