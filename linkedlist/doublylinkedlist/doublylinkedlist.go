@@ -5,7 +5,9 @@ import "fmt"
 // List represents a doubly-linked List
 // that holds values of any type.
 type List[T any] struct {
-	Head   *Node[T]
+	// Head - first element of linked list.
+	Head *Node[T]
+	// Tail - last element of linked list.
 	Tail   *Node[T]
 	Length int
 }
