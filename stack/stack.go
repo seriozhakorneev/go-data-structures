@@ -9,7 +9,7 @@ type Stack[T any] struct {
 
 func (s *Stack[T]) String() string {
 	return fmt.Sprintf(
-		"%v, Len(%v), cap(%v)",
+		"%v, Length(%v), cap(%v)",
 		s.St, s.Len, s.Capacity,
 	)
 }
