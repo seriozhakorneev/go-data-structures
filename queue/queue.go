@@ -3,8 +3,8 @@ package queue
 import "fmt"
 
 type Queue[T any] struct {
-	Qu            []T
-	Capacity, Len int
+	Qu       []T
+	Cap, Len int
 }
 
 func (q *Queue[T]) String() string {
@@ -14,13 +14,14 @@ func (q *Queue[T]) String() string {
 
 	return fmt.Sprintf(
 		"Length(%v), cap(%v)",
-		q.Len, q.Capacity,
+		q.Len, q.Cap,
 	)
 }
 
-// New provide 0 Capacity to make Queue Capacity infinite
+// New - returns new Queue with provided capacity.
+// provide 0 capacity to make Queue capacity infinite
 func New[T any](capacity int) Queue[T] {
-	return Queue[T]{Capacity: capacity}
+	return Queue[T]{Cap: capacity}
 }
 
 func (q *Queue[T]) IsEmpty() bool {
@@ -28,9 +29,10 @@ func (q *Queue[T]) IsEmpty() bool {
 }
 
 func (q *Queue[T]) IsFull() bool {
-	if q.Len < q.Capacity || q.Capacity == 0 {
+	if q.Len < q.Cap || q.Cap == 0 {
 		return false
 	}
+
 	return true
 }
 
@@ -53,6 +55,7 @@ func (q *Queue[T]) Enqueue(element T) bool {
 		q.Len++
 		return true
 	}
+
 	return false
 }
 
@@ -65,5 +68,6 @@ func (q *Queue[T]) Dequeue() (T, bool) {
 	element := q.Qu[0]
 	q.Qu = (q.Qu)[1:]
 	q.Len--
+
 	return element, true
 }
