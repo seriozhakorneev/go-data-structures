@@ -1,156 +1,190 @@
 package doublylinkedlist
 
-import (
-	"fmt"
-)
+import "fmt"
 
-// List represents a doubly linked List
+// List represents a doubly-linked List
 // that holds values of any type.
 type List[T any] struct {
-	head *Node[T]
-	len  int
-	tail *Node[T]
+	Head   *Node[T]
+	Tail   *Node[T]
+	Length int
 }
 
 // Node represents a doubly-linked Node
 // that holds values of any type.
 type Node[T any] struct {
-	prev *Node[T]
-	val  T
-	next *Node[T]
+	Prev  *Node[T]
+	Value T
+	Next  *Node[T]
 }
 
+// New - returns new List.
+func New[T any]() *List[T] {
+	head := &Node[T]{}
+
+	return &List[T]{
+		Head:   head,
+		Length: 0,
+		Tail:   head.Next,
+	}
+}
+
+// Append - adds new Tail to List, after last Tail.
 func (l *List[T]) Append(v T) {
-	if l.head == nil {
+	if l.Head == nil {
 		return
 	}
-	ptr := l.head
+
+	ptr := l.Head
+	tail := AddNode(ptr, nil, v)
+
 	for {
-		if ptr.next == nil {
-			ptr.next = AddNode(ptr, nil, v)
+		if ptr.Next == nil {
+			ptr.Next = tail
 			break
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
-	l.tail = ptr.next
-	l.len++
+
+	l.Tail = tail
+	l.Length++
 }
 
+// Insert - adds new Node, on position after current Node.
+// If any Node exists next to current, it becomes next to new.
+// Method disconnected with List type, will not affect Tail or Length.
 func (l *Node[T]) Insert(v T) {
 	if l == nil {
 		return
 	}
-	l.next = AddNode[T](l, l.next, v)
-	l.next.next.prev = l.next
+
+	l.Next = AddNode[T](l, l.Next, v)
+	l.Next.Next.Prev = l.Next
 }
 
+// AddNode - returns new Node with provided parameters.
+func AddNode[T any](prev, next *Node[T], value T) *Node[T] {
+	return &Node[T]{
+		Prev:  prev,
+		Value: value,
+		Next:  next,
+	}
+}
+
+// FillWithRange - generate List from provided range.
+func FillWithRange(l *List[int], from, to int) {
+	l.Head.Value = from
+	l.Length++
+
+	ptr := l.Head
+	for i := from + 1; i <= to; i++ {
+		if ptr.Next == nil {
+			ptr.Next = AddNode[int](ptr, nil, i)
+			l.Tail = ptr.Next
+			l.Length++
+		}
+		ptr = ptr.Next
+	}
+}
+
+// FillWithStrings - generate List from provided strings.
+func FillWithStrings(l *List[string], s ...string) {
+	if len(s) == 0 {
+		return
+	}
+
+	l.Head.Value = s[0]
+	l.Length++
+
+	ptr := l.Head
+	for i, el := range s[1:] {
+		if ptr.Next == nil {
+			node := AddNode[string](ptr, nil, el)
+			ptr.Next = node
+			l.Length++
+
+			if i == len(s[1:])-1 {
+				l.Tail = node
+			}
+		}
+		ptr = ptr.Next
+	}
+}
+
+// PrintList - prints all Node's, from Head to Tail.
 func (l *List[T]) PrintList() {
-	ptr := l.head
+	ptr := l.Head
+
 	for {
-		ptr.Print()
-		if ptr.next == nil {
+		ptr.PrintNode()
+		if ptr.Next == nil {
 			break
 		}
-		ptr = ptr.next
+		ptr = ptr.Next
 	}
-	fmt.Println("len:", l.len)
+
+	fmt.Println("Length:", l.Length)
 }
 
-func (l *Node[T]) Print() {
+// PrintNode - print Node Value, and its Next Node Value.
+func (l *Node[T]) PrintNode() {
 	if l == nil {
 		fmt.Print(nil)
 		return
 	}
+
 	fmt.Printf("%v<-%v->%v ",
 		func() interface{} {
-			if l.prev != nil {
-				return l.prev.val
+			if l.Prev != nil {
+				return l.Prev.Value
 			}
 			return nil
 		}(),
-		l.val,
+		l.Value,
 		func() interface{} {
-			if l.next != nil {
-				return l.next.val
+			if l.Next != nil {
+				return l.Next.Value
 			}
 			return nil
 		}(),
 	)
 }
 
+// PrintListReversed - prints all Node's in reversed order, from Tail to Head.
 func (l *List[T]) PrintListReversed() {
-	ptr := l.tail
+	ptr := l.Tail
+
 	for {
 		ptr.PrintNodeReversed()
-		if ptr.prev == nil {
+		if ptr.Prev == nil {
 			break
 		}
-		ptr = ptr.prev
+		ptr = ptr.Prev
 	}
-	fmt.Println("len:", l.len)
+
+	fmt.Println("Length:", l.Length)
 }
 
+// PrintNodeReversed - print Node Value, and its Next Node Value, in reversed order.
 func (l *Node[T]) PrintNodeReversed() {
 	if l == nil {
 		fmt.Print(nil)
 		return
 	}
+
 	fmt.Printf("%v<-%v->%v ",
 		func() interface{} {
-			if l.next != nil {
-				return l.next.val
+			if l.Next != nil {
+				return l.Next.Value
 			}
 			return nil
 		}(),
-		l.val,
+		l.Value,
 		func() interface{} {
-			if l.prev != nil {
-				return l.prev.val
+			if l.Prev != nil {
+				return l.Prev.Value
 			}
 			return nil
 		}(),
 	)
-}
-
-func New[T any]() *List[T] {
-	return &List[T]{
-		head: &Node[T]{},
-		len:  0,
-		tail: &Node[T]{},
-	}
-}
-
-func AddNode[T any](prev, next *Node[T], value T) *Node[T] {
-	return &Node[T]{
-		prev: prev,
-		val:  value,
-		next: next,
-	}
-}
-
-func FillWithRange(l *List[int], from, to int) {
-	l.head.val = from
-	l.len++
-	ptr := l.head
-	for i := from + 1; i <= to; i++ {
-		if ptr.next == nil {
-			ptr.next = AddNode[int](ptr, nil, i)
-			l.tail = ptr.next
-			l.len++
-		}
-		ptr = ptr.next
-	}
-}
-
-func FillWithStrings(l *List[string], s ...string) {
-	l.head.val = s[0]
-	l.len++
-	ptr := l.head
-	for _, el := range s[1:] {
-		if ptr.next == nil {
-			ptr.next = AddNode[string](ptr, nil, el)
-			l.len++
-		}
-		ptr = ptr.next
-	}
 }

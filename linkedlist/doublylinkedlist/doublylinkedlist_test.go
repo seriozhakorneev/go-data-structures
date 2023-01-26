@@ -1,4 +1,4 @@
-package singlylinkedlist
+package doublylinkedlist
 
 import (
 	"reflect"
@@ -77,7 +77,7 @@ func TestAddNode(t *testing.T) {
 	t.Parallel()
 
 	expNode := &Node[string]{Value: "string"}
-	node := AddNode("string")
+	node := AddNode(nil, nil, "string")
 
 	if !reflect.DeepEqual(expNode, node) {
 		t.Fatalf("Expected node: %v\nGot: %v", expNode, node)
@@ -87,52 +87,15 @@ func TestAddNode(t *testing.T) {
 func TestFillWithRange(t *testing.T) {
 	t.Parallel()
 
-	tail := &Node[int]{Value: 3}
-	expList := &List[int]{
-		Head: &Node[int]{
-			Value: 1,
-			Next: &Node[int]{
-				Value: 2,
-				Next:  tail,
-			},
-		},
-		Tail:   tail,
-		Length: 3,
-	}
+	expList := &List[int]{}
+	expList.Head = AddNode[int](nil, nil, 1)
+	expList.Head.Next = AddNode[int](expList.Head, nil, 2)
+	tail := AddNode[int](expList.Head.Next, nil, 3)
+	expList.Head.Next.Next = tail
+	expList.Tail, expList.Length = tail, 3
 
 	list := New[int]()
 	FillWithRange(list, 1, 3)
-
-	if !reflect.DeepEqual(expList, list) {
-		t.Fatalf("Expected list: %v\nGot: %v", expList, list)
-	}
-}
-
-func TestFillWithInts(t *testing.T) {
-	t.Parallel()
-
-	list := New[int]()
-	FillWithInts(list, []int{})
-
-	if list.Length != 0 || list.Tail != nil {
-		t.Fatal("Expected list(length > 0, tail != nil)\nGot:", list)
-	}
-
-	tail := &Node[int]{Value: 3}
-	expList := &List[int]{
-		Head: &Node[int]{
-			Value: 1,
-			Next: &Node[int]{
-				Value: 2,
-				Next:  tail,
-			},
-		},
-		Tail:   tail,
-		Length: 3,
-	}
-
-	list = New[int]()
-	FillWithInts(list, []int{1, 2, 3})
 
 	if !reflect.DeepEqual(expList, list) {
 		t.Fatalf("Expected list: %v\nGot: %v", expList, list)
@@ -149,18 +112,12 @@ func TestFillWithStrings(t *testing.T) {
 		t.Fatal("Expected list(length > 0, tail != nil)\nGot:", list)
 	}
 
-	tail := &Node[string]{Value: "3"}
-	expList := &List[string]{
-		Head: &Node[string]{
-			Value: "1",
-			Next: &Node[string]{
-				Value: "2",
-				Next:  tail,
-			},
-		},
-		Tail:   tail,
-		Length: 3,
-	}
+	expList := &List[string]{}
+	expList.Head = AddNode[string](nil, nil, "1")
+	expList.Head.Next = AddNode[string](expList.Head, nil, "2")
+	tail := AddNode[string](expList.Head.Next, nil, "3")
+	expList.Head.Next.Next = tail
+	expList.Tail, expList.Length = tail, 3
 
 	list = New[string]()
 	FillWithStrings(list, "1", "2", "3")

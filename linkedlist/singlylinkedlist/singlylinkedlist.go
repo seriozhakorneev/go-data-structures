@@ -19,8 +19,8 @@ type Node[T any] struct {
 	Next  *Node[T]
 }
 
-// NewList - returns new List.
-func NewList[T any]() *List[T] {
+// New - returns new List.
+func New[T any]() *List[T] {
 	head := &Node[T]{}
 
 	return &List[T]{
