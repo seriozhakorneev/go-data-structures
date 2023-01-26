@@ -1,8 +1,6 @@
 package singlylinkedlist
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // List - represents a singly-linked list,
 // that holds values of any type.
@@ -51,9 +49,10 @@ func (l *List[T]) Append(v T) {
 	l.Length++
 }
 
-// InsertNext - adds new Node, on position after current Node.
+// Insert - adds new Node, on position after current Node.
 // If any Node exists next to current, it becomes next to new.
-func (l *Node[T]) InsertNext(v T) {
+// Method disconnected with List type, will not affect Tail or Length.
+func (l *Node[T]) Insert(v T) {
 	if l == nil {
 		return
 	}
@@ -61,38 +60,6 @@ func (l *Node[T]) InsertNext(v T) {
 	tmp := l.Next
 	l.Next = AddNode[T](v)
 	l.Next.Next = tmp
-}
-
-// PrintList - prints all Node's, from Head to Tail.
-func (l *List[T]) PrintList() {
-	ptr := l.Head
-
-	for {
-		ptr.PrintNode()
-		if ptr.Next == nil {
-			break
-		}
-		ptr = ptr.Next
-	}
-
-	fmt.Println("Length:", l.Length)
-}
-
-// PrintNode - print Node Value, and its Next Node Value
-func (l *Node[T]) PrintNode() {
-	if l == nil {
-		fmt.Print(nil)
-		return
-	}
-
-	fmt.Printf("%v->%v ",
-		l.Value,
-		func() any {
-			if l.Next != nil {
-				return l.Next.Value
-			}
-			return nil
-		}())
 }
 
 // AddNode - returns new Node with provided value.
@@ -136,7 +103,7 @@ func FillWithInts(l *List[int], a []int) {
 			ptr.Next = node
 			l.Length++
 
-			if i == len(a)-1 {
+			if i == len(a[1:])-1 {
 				l.Tail = node
 			}
 		}
@@ -160,10 +127,45 @@ func FillWithStrings(l *List[string], s ...string) {
 			ptr.Next = node
 			l.Length++
 
-			if i == len(s)-1 {
+			if i == len(s[1:])-1 {
 				l.Tail = node
 			}
 		}
 		ptr = ptr.Next
 	}
+}
+
+// PrintList - prints all Node's, from Head to Tail.
+func (l *List[T]) PrintList() {
+	if l.Head == nil {
+		fmt.Println(nil)
+	}
+	ptr := l.Head
+
+	for {
+		ptr.PrintNode()
+		if ptr.Next == nil {
+			break
+		}
+		ptr = ptr.Next
+	}
+
+	fmt.Println("Length:", l.Length)
+}
+
+// PrintNode - print Node Value, and its Next Node Value
+func (l *Node[T]) PrintNode() {
+	if l == nil {
+		fmt.Print(nil)
+		return
+	}
+
+	fmt.Printf("%v->%v ",
+		l.Value,
+		func() any {
+			if l.Next != nil {
+				return l.Next.Value
+			}
+			return nil
+		}())
 }
