@@ -1,8 +1,6 @@
 package doublylinkedlist
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // List represents a doubly-linked List
 // that holds values of any type.
@@ -70,6 +68,46 @@ func AddNode[T any](prev, next *Node[T], value T) *Node[T] {
 		Prev:  prev,
 		Value: value,
 		Next:  next,
+	}
+}
+
+// FillWithRange - generate List from provided range.
+func FillWithRange(l *List[int], from, to int) {
+	l.Head.Value = from
+	l.Length++
+
+	ptr := l.Head
+	for i := from + 1; i <= to; i++ {
+		if ptr.Next == nil {
+			ptr.Next = AddNode[int](ptr, nil, i)
+			l.Tail = ptr.Next
+			l.Length++
+		}
+		ptr = ptr.Next
+	}
+}
+
+// FillWithStrings - generate List from provided strings.
+func FillWithStrings(l *List[string], s ...string) {
+	if len(s) == 0 {
+		return
+	}
+
+	l.Head.Value = s[0]
+	l.Length++
+
+	ptr := l.Head
+	for i, el := range s[1:] {
+		if ptr.Next == nil {
+			node := AddNode[string](ptr, nil, el)
+			ptr.Next = node
+			l.Length++
+
+			if i == len(s[1:])-1 {
+				l.Tail = node
+			}
+		}
+		ptr = ptr.Next
 	}
 }
 
@@ -149,35 +187,4 @@ func (l *Node[T]) PrintNodeReversed() {
 			return nil
 		}(),
 	)
-}
-
-// FillWithRange - generate List from provided range.
-func FillWithRange(l *List[int], from, to int) {
-	l.Head.Value = from
-	l.Length++
-
-	ptr := l.Head
-	for i := from + 1; i <= to; i++ {
-		if ptr.Next == nil {
-			ptr.Next = AddNode[int](ptr, nil, i)
-			l.Tail = ptr.Next
-			l.Length++
-		}
-		ptr = ptr.Next
-	}
-}
-
-// FillWithStrings - generate List from provided strings.
-func FillWithStrings(l *List[string], s ...string) {
-	l.Head.Value = s[0]
-	l.Length++
-
-	ptr := l.Head
-	for _, el := range s[1:] {
-		if ptr.Next == nil {
-			ptr.Next = AddNode[string](ptr, nil, el)
-			l.Length++
-		}
-		ptr = ptr.Next
-	}
 }
