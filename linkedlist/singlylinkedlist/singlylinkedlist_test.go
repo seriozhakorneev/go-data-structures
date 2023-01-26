@@ -15,7 +15,7 @@ func TestNewList(t *testing.T) {
 		Length: 0,
 	}
 
-	list := NewList[string]()
+	list := New[string]()
 
 	if !reflect.DeepEqual(expList, list) {
 		t.Fatalf("Expected list: %v\nGot: %v", expList, list)
@@ -26,7 +26,7 @@ func TestAppend(t *testing.T) {
 	t.Parallel()
 
 	expList := &List[int8]{}
-	list := NewList[int8]()
+	list := New[int8]()
 	list.Head = nil
 
 	list.Append(1)
@@ -35,7 +35,7 @@ func TestAppend(t *testing.T) {
 		t.Fatalf("Expected list: %v\nGot: %v", expList, list)
 	}
 
-	list = NewList[int8]()
+	list = New[int8]()
 	list.Append(15)
 	list.Append(15)
 
@@ -51,7 +51,7 @@ func TestInsertNext(t *testing.T) {
 	var node *Node[any]
 	node.Insert(1)
 
-	expList := NewList[int]()
+	expList := New[int]()
 	FillWithRange(expList, 1, 3)
 
 	list := &Node[int]{
@@ -100,7 +100,7 @@ func TestFillWithRange(t *testing.T) {
 		Length: 3,
 	}
 
-	list := NewList[int]()
+	list := New[int]()
 	FillWithRange(list, 1, 3)
 
 	if !reflect.DeepEqual(expList, list) {
@@ -111,7 +111,7 @@ func TestFillWithRange(t *testing.T) {
 func TestFillWithInts(t *testing.T) {
 	t.Parallel()
 
-	list := NewList[int]()
+	list := New[int]()
 	FillWithInts(list, []int{})
 
 	if list.Length != 0 || list.Tail != nil {
@@ -131,7 +131,7 @@ func TestFillWithInts(t *testing.T) {
 		Length: 3,
 	}
 
-	list = NewList[int]()
+	list = New[int]()
 	FillWithInts(list, []int{1, 2, 3})
 
 	if !reflect.DeepEqual(expList, list) {
@@ -142,7 +142,7 @@ func TestFillWithInts(t *testing.T) {
 func TestFillWithStrings(t *testing.T) {
 	t.Parallel()
 
-	list := NewList[string]()
+	list := New[string]()
 	FillWithStrings(list)
 
 	if list.Length != 0 || list.Tail != nil {
@@ -162,7 +162,7 @@ func TestFillWithStrings(t *testing.T) {
 		Length: 3,
 	}
 
-	list = NewList[string]()
+	list = New[string]()
 	FillWithStrings(list, "1", "2", "3")
 
 	if !reflect.DeepEqual(expList, list) {
