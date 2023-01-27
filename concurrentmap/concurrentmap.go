@@ -4,18 +4,7 @@ import (
 	"sync"
 )
 
-/*
-Реализовать библиотеку универсального key-value хранилища.
-
-Основные требования к реализации:
-
-Должны поддерживаться все сравниваемые типы данных, т.е. хранилище должно уметь
-работать с ключами и значениями типа interface{}.
-Должны поддерживаться следующие операции: вставка, получение, обновление и удаление.
-Хранилище должно быть потокобезопасным (согласованное чтение и запись из разных горутин).
-*/
-
-// CMap - concurrent-safety map
+// CMap - concurrent-safety map.
 type CMap[K comparable, V any] struct {
 	mu sync.RWMutex
 	m  map[K]V
@@ -31,7 +20,7 @@ func New[K comparable, V any]() *CMap[K, V] {
 	}
 }
 
-// Insert -
+// Insert - creates new entry with provided key, value.
 func (c *CMap[K, V]) Insert(key K, value V) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -39,6 +28,8 @@ func (c *CMap[K, V]) Insert(key K, value V) {
 	c.m[key] = value
 }
 
+// Get - returns value lying at provided key and true,
+// if entry with key not exist, returns zero value  and false.
 func (c *CMap[K, V]) Get(key K) (V, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -50,23 +41,34 @@ func (c *CMap[K, V]) Get(key K) (V, bool) {
 	return c.zero, false
 }
 
-//
-//func (m *MyStorage) Update(k, value any) (bool, error) {
-//	m.mu.Lock()
-//	defer m.mu.Unlock()
-//
-//	if _, ok := m.m[k]; !ok {
-//		return false, KeyNotFound
-//	}
-//
-//	m.m[k] = value
-//	return true, nil
-//}
-//
-//func (m *MyStorage) Delete(k any) error {
-//	m.mu.Lock()
-//	defer m.mu.Unlock()
-//	delete(m.m, k)
-//
-//	return nil
-//}
+// Update - returns true, if value for key are set, else returns false.
+func (c *CMap[K, V]) Update(key K, value V) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if _, ok := c.m[key]; ok {
+		c.m[key] = value
+		return true
+	}
+
+	return false
+}
+
+// Delete - returns true, if entry by provided key are deleted,
+// else return false.
+func (c *CMap[K, V]) Delete(key K) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if _, ok := c.m[key]; ok {
+		delete(c.m, key)
+		return true
+	}
+
+	return false
+}
+
+// getMap - returns underlying map m
+func (c *CMap[K, V]) getMap() map[K]V {
+	return c.m
+}
