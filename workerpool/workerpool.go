@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"runtime"
 )
 
 const (
@@ -17,6 +16,7 @@ const (
 	statusFailed
 )
 
+// taskType - default task type.
 type taskType func() taskResult
 
 // TODO: doc
@@ -31,7 +31,7 @@ type WorkerPool struct {
 	//TODO: singleton
 }
 
-// taskResult - task execution result
+// taskResult - task execution result.
 type taskResult struct {
 	// Status - task status at the end of execution.
 	Status int
@@ -74,11 +74,20 @@ func (wp *WorkerPool) Run() {
 }
 
 // AddTasks - sending tasks to workers through executeC channel,
-// if sends more than one, for better performance, should be sent as slice
-// (not for loop with repeatedly calling AddTasks).
-func (wp *WorkerPool) AddTasks(tasks ...taskType) {
-	if tasks == nil {
-		return
+// if sends more than one, for better performance, should be sent as slice,
+// not for loop with repeatedly calling AddTasks.
+func (wp *WorkerPool) AddTasks(tasks ...taskType) (err error) {
+	err = fmt.Errorf("failed to add zero tasks")
+
+	for _, task := range tasks {
+		if task == nil {
+			return fmt.Errorf("failed to add <nil> task")
+		}
+		err = nil
+	}
+
+	if err != nil {
+		return err
 	}
 
 	go func() {
@@ -86,6 +95,8 @@ func (wp *WorkerPool) AddTasks(tasks ...taskType) {
 			wp.executeC <- task
 		}
 	}()
+
+	return nil
 }
 
 // writeResult - writes result to resultsC channel.
@@ -103,33 +114,40 @@ func main() {
 
 	wp, err := New(workers)
 	if err != nil {
-		log.Fatal("failed to create worker pool, %w", err)
+		log.Fatal("failed to create worker pool: ", err)
 	}
 
 	wp.Run()
 
-	wp.AddTasks([]taskType{
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusFailed, AddInfo: "some error description"}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-	}...)
-
-	for {
-		select {
-		case l := <-wp.Result():
-			fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine()-2)
-		}
+	err = wp.AddTasks([]taskType{func() taskResult {
+		return taskResult{}
+	}}...)
+	if err != nil {
+		log.Fatal("failed to add tasks: ", err)
 	}
+
+	//wp.AddTasks([]taskType{
+	//	func() taskResult {
+	//		return taskResult{Status: statusSuccess}
+	//	},
+	//	func() taskResult {
+	//		return taskResult{Status: statusSuccess}
+	//	},
+	//	func() taskResult {
+	//		return taskResult{Status: statusSuccess}
+	//	},
+	//	func() taskResult {
+	//		return taskResult{Status: statusFailed, AddInfo: "some error description"}
+	//	},
+	//	func() taskResult {
+	//		return taskResult{Status: statusSuccess}
+	//	},
+	//}...)
+
+	//for {
+	//	select {
+	//	case l := <-wp.Result():
+	//		fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine()-2)
+	//	}
+	//}
 }
