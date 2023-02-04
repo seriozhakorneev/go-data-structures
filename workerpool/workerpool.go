@@ -1,11 +1,11 @@
-// TODO : asdasda
+// package workerpool
 package main
-
-//package workerpool
 
 import (
 	"fmt"
 	"log"
+	"runtime"
+	"sync"
 )
 
 const (
@@ -19,16 +19,16 @@ const (
 // taskType - default task type.
 type taskType func() taskResult
 
-// TODO: doc
+// WorkerPool - a pool of fixed workers(goroutines),
+// performing constantly arriving tasks.
 type WorkerPool struct {
+	sync.Once
 	// wCount - count of workers.
 	wCount int
 	// executeC - a queue channel that delivers tasks to workers.
 	executeC chan taskType
 	// resultsC - data collection channel from executed workers.
 	resultsC chan taskResult
-
-	//TODO: singleton
 }
 
 // taskResult - task execution result.
@@ -36,7 +36,7 @@ type taskResult struct {
 	// Status - task status at the end of execution.
 	Status int
 	// AddInfo - additional information field.
-	AddInfo string
+	AddInfo interface{}
 }
 
 // New - returns *workerPool with provided count of workers.
@@ -55,10 +55,8 @@ func New(workers int) (*WorkerPool, error) {
 	}, nil
 }
 
-// Run - runs background workers(goroutines).Count of workers depends
-// on workers count field wCount, provided in New. Every worker
-// takes task, execute and write result via writeResult.
-func (wp *WorkerPool) Run() {
+// startPool - spawns workers-goroutines, make them listening to incoming tasks
+func (wp *WorkerPool) startPool() {
 	for ; wp.wCount > 0; wp.wCount-- {
 		go func() int {
 			for {
@@ -71,6 +69,16 @@ func (wp *WorkerPool) Run() {
 			}
 		}()
 	}
+}
+
+// Run - runs background workers(goroutines).Count of workers depends
+// on workers count field wCount, provided in New. Every worker
+// takes task, execute and write result via writeResult.
+func (wp *WorkerPool) Run() {
+	wp.Once.Do(func() {
+		log.Printf("Worker pool started with %d workers\n", wp.wCount)
+		wp.startPool()
+	})
 }
 
 // AddTasks - sending tasks to workers through executeC channel,
@@ -109,6 +117,9 @@ func (wp *WorkerPool) Result() chan taskResult {
 	return wp.resultsC
 }
 
+// TODO: method stop worker pool with quit channel
+// TODO: method to let user know if there tasks still spinning in wp
+
 func main() {
 	workers := 12
 
@@ -119,35 +130,58 @@ func main() {
 
 	wp.Run()
 
-	err = wp.AddTasks([]taskType{func() taskResult {
-		return taskResult{}
-	}}...)
+	err = wp.AddTasks([]taskType{
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess, AddInfo: 12 * 356}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusFailed, AddInfo: "some error description"}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess, AddInfo: 12 * 356}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusFailed, AddInfo: "some error description"}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+		func() taskResult {
+			return taskResult{Status: statusSuccess}
+		},
+	}...)
 	if err != nil {
 		log.Fatal("failed to add tasks: ", err)
 	}
 
-	//wp.AddTasks([]taskType{
-	//	func() taskResult {
-	//		return taskResult{Status: statusSuccess}
-	//	},
-	//	func() taskResult {
-	//		return taskResult{Status: statusSuccess}
-	//	},
-	//	func() taskResult {
-	//		return taskResult{Status: statusSuccess}
-	//	},
-	//	func() taskResult {
-	//		return taskResult{Status: statusFailed, AddInfo: "some error description"}
-	//	},
-	//	func() taskResult {
-	//		return taskResult{Status: statusSuccess}
-	//	},
-	//}...)
-
-	//for {
-	//	select {
-	//	case l := <-wp.Result():
-	//		fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine()-2)
-	//	}
-	//}
+	for {
+		select {
+		case l := <-wp.Result():
+			fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine())
+		}
+	}
 }
