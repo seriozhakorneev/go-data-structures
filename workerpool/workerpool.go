@@ -4,32 +4,32 @@ package main
 import (
 	"fmt"
 	"log"
-	"runtime"
 	"sync"
 )
 
 const (
-	//TODO other consts
-
 	// Tasks execution result statuses.
 	statusSuccess = iota + 1
 	statusFailed
 )
 
-// taskType - default task type.
-type taskType func() taskResult
-
 // WorkerPool - a pool of fixed workers(goroutines),
 // performing constantly arriving tasks.
 type WorkerPool struct {
+	// used to startPool only once.
 	sync.Once
 	// wCount - count of workers.
 	wCount int
+	// workload - workload of workers
+	workload []bool
 	// executeC - a queue channel that delivers tasks to workers.
 	executeC chan taskType
 	// resultsC - data collection channel from executed workers.
 	resultsC chan taskResult
 }
+
+// taskType - default task type.
+type taskType func() taskResult
 
 // taskResult - task execution result.
 type taskResult struct {
@@ -50,25 +50,10 @@ func New(workers int) (*WorkerPool, error) {
 
 	return &WorkerPool{
 		wCount:   workers,
+		workload: make([]bool, workers),
 		executeC: make(chan taskType),
 		resultsC: make(chan taskResult),
 	}, nil
-}
-
-// startPool - spawns workers-goroutines, make them listening to incoming tasks
-func (wp *WorkerPool) startPool() {
-	for ; wp.wCount > 0; wp.wCount-- {
-		go func() int {
-			for {
-				select {
-				case task := <-wp.executeC:
-					wp.writeResult(task())
-				default:
-					continue
-				}
-			}
-		}()
-	}
 }
 
 // Run - runs background workers(goroutines).Count of workers depends
@@ -79,6 +64,24 @@ func (wp *WorkerPool) Run() {
 		log.Printf("Worker pool started with %d workers\n", wp.wCount)
 		wp.startPool()
 	})
+}
+
+// startPool - spawns workers-goroutines, make them listening to incoming tasks.
+func (wp *WorkerPool) startPool() {
+	for i := 0; i < wp.wCount; i++ {
+		go func(wNum int) int {
+			for {
+				select {
+				case task := <-wp.executeC:
+					wp.workload[wNum] = true
+					wp.writeResult(task())
+				default:
+					wp.workload[wNum] = false
+					continue
+				}
+			}
+		}(i)
+	}
 }
 
 // AddTasks - sending tasks to workers through executeC channel,
@@ -117,16 +120,29 @@ func (wp *WorkerPool) Result() chan taskResult {
 	return wp.resultsC
 }
 
+// TODO: doc
+func (wp *WorkerPool) Loaded() bool {
+	// TODO: method to let user know if there tasks still spinning in wp
+	for _, wStatus := range wp.workload {
+		if wStatus {
+			return true
+		}
+	}
+
+	return false
+}
+
 // TODO: method stop worker pool with quit channel
-// TODO: method to let user know if there tasks still spinning in wp
 
 func main() {
-	workers := 12
+	workers := 5
 
 	wp, err := New(workers)
 	if err != nil {
 		log.Fatal("failed to create worker pool: ", err)
 	}
+
+	fmt.Println("new", wp.workload)
 
 	wp.Run()
 
@@ -138,24 +154,6 @@ func main() {
 			return taskResult{Status: statusSuccess, AddInfo: 12 * 356}
 		},
 		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusFailed, AddInfo: "some error description"}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
 			return taskResult{Status: statusSuccess, AddInfo: 12 * 356}
 		},
 		func() taskResult {
@@ -164,24 +162,49 @@ func main() {
 		func() taskResult {
 			return taskResult{Status: statusFailed, AddInfo: "some error description"}
 		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: statusSuccess}
-		},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess, AddInfo: 12 * 356}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusFailed, AddInfo: "some error description"}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
+		//func() taskResult {
+		//	return taskResult{Status: statusSuccess}
+		//},
 	}...)
 	if err != nil {
 		log.Fatal("failed to add tasks: ", err)
 	}
 
+	//fmt.Println(wp.wCount)
+
 	for {
 		select {
 		case l := <-wp.Result():
-			fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine())
+			//time.Sleep(1 * time.Second)
+			fmt.Println(l, wp.workload)
+			//fmt.Println("result:", l.Status, l.AddInfo, "|goroutines:", runtime.NumGoroutine())
 		}
 	}
 }
