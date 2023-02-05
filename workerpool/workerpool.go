@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -18,8 +19,9 @@ const (
 // WorkerPool - a pool of fixed workers(goroutines),
 // performing constantly arriving tasks.
 type WorkerPool struct {
-	// used to startPool only once.
 	sync.Once
+	cancel context.CancelFunc
+
 	// wCount - count of workers.
 	wCount int
 	// workload - stores the boolean value of workload of workers.
@@ -61,16 +63,19 @@ func New(workers int) (*WorkerPool, error) {
 // on workers count field wCount, provided in New. Every worker
 // takes task, execute and write result via writeResult.
 func (wp *WorkerPool) Run() {
+	ctx := context.Background()
+	ctx, wp.cancel = context.WithCancel(ctx)
+
 	wp.Once.Do(func() {
 		log.Printf("Worker pool started with %d workers\n", wp.wCount)
-		wp.startPool()
+		wp.startPool(ctx)
 	})
 }
 
 // startPool - spawns workers-goroutines, make them listening to incoming tasks.
-func (wp *WorkerPool) startPool() {
+func (wp *WorkerPool) startPool(ctx context.Context) {
 	for i := 0; i < wp.wCount; i++ {
-		go func() int {
+		go func() {
 			for {
 				select {
 				case task := <-wp.executeC:
@@ -78,12 +83,16 @@ func (wp *WorkerPool) startPool() {
 					// Executing task and writing its results.
 					wp.writeResult(task())
 					_ = wp.workload.Swap(false)
+				case <-ctx.Done():
+					// finish worker
+					return
 				default:
 					continue
 				}
 			}
 		}()
 	}
+	// TODO send to ready<- channel goroutines are up?????
 }
 
 // AddTasks - sending tasks to workers through executeC channel,
@@ -127,20 +136,26 @@ func (wp *WorkerPool) Loaded() bool {
 	return wp.workload.Load()
 }
 
-// TODO: method stop worker pool with quit channel
+// Stop - closing all workers in worker pool, if they are not work loaded.
+func (wp *WorkerPool) Stop() error {
+	if wp.Loaded() {
+		return fmt.Errorf("some tasks are in process")
+	}
+
+	wp.cancel()
+
+	return nil
+}
 
 func main() {
-	workers := 5
+	workers := 10
 
 	wp, err := New(workers)
 	if err != nil {
 		log.Fatal("failed to create worker pool: ", err)
 	}
 
-	fmt.Println("after new", wp.workload.Load())
-
 	wp.Run()
-	fmt.Println("after run", wp.workload.Load())
 
 	err = wp.AddTasks([]taskType{
 		func() taskResult {
@@ -202,11 +217,17 @@ ll:
 			if l.Status == 2 {
 				break ll
 			}
-
 		}
 	}
 
-	fmt.Println(wp.workload.Load())
+	err = wp.Stop()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	time.Sleep(1 * time.Second)
-	fmt.Println(wp.workload.Load())
+
+	//fmt.Println(wp.workload.Load())
+	//time.Sleep(1 * time.Second)
+	//fmt.Println(wp.workload.Load())
 }
