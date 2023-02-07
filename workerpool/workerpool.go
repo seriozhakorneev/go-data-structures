@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"sync"
 	"sync/atomic"
-	"time"
 )
 
 // Tasks execution result statuses.
@@ -68,7 +67,7 @@ func (wp *WorkerPool) Run() {
 	ctx, wp.cancel = context.WithCancel(ctx)
 
 	wp.Once.Do(func() {
-		log.Printf("Worker pool started with %d workers\n", wp.wCount)
+		log.Printf("Pool started with %d workers\n", wp.wCount)
 		wp.startPool(ctx)
 	})
 }
@@ -145,47 +144,4 @@ func (wp *WorkerPool) Stop() error {
 	wp.cancel()
 
 	return nil
-}
-
-func main() {
-	wp := New()
-
-	wp.Run()
-
-	var tasks []taskType
-	for i := 1; i <= 2; i++ {
-		x := i
-		tasks = append(tasks, func() taskResult {
-			return taskResult{Status: StatusSuccess, AddInfo: x}
-		})
-	}
-
-	tasks = append(tasks, func() taskResult {
-		return taskResult{Status: StatusFailed, AddInfo: "error"}
-	})
-
-	err := wp.AddTasks(tasks...)
-	if err != nil {
-		log.Fatal("failed to add tasks: ", err)
-	}
-
-ll:
-	for {
-		select {
-		case l := <-wp.Result():
-			fmt.Println(l, runtime.NumGoroutine())
-
-			if l.Status == 2 {
-				break ll
-			}
-		}
-	}
-
-	err = wp.Stop()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	time.Sleep(1 * time.Second)
-	fmt.Println(wp.workload.Load(), runtime.NumGoroutine())
 }
