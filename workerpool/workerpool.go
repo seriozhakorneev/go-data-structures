@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -44,19 +45,19 @@ type taskResult struct {
 }
 
 // New - returns *workerPool with provided count of workers.
-func New(workers int) (*WorkerPool, error) {
-	if workers < 1 {
-		return nil, fmt.Errorf(
-			"workers count should be more than 1, got: %d",
-			workers,
-		)
+// If workers count of workers not provided it will be set to runtime.NumCPU()-1.
+func New(workers ...int) *WorkerPool {
+
+	if len(workers) < 1 {
+		// set default workers count
+		workers = append(workers, runtime.NumCPU()-1)
 	}
 
 	return &WorkerPool{
-		wCount:   workers,
+		wCount:   workers[0],
 		executeC: make(chan taskType),
 		resultsC: make(chan taskResult),
-	}, nil
+	}
 }
 
 // Run - runs background workers(goroutines).Count of workers depends
@@ -92,7 +93,6 @@ func (wp *WorkerPool) startPool(ctx context.Context) {
 			}
 		}()
 	}
-	// TODO send to ready<- channel goroutines are up?????
 }
 
 // AddTasks - sending tasks to workers through executeC channel,
@@ -148,62 +148,23 @@ func (wp *WorkerPool) Stop() error {
 }
 
 func main() {
-	workers := 10
-
-	wp, err := New(workers)
-	if err != nil {
-		log.Fatal("failed to create worker pool: ", err)
-	}
+	wp := New()
 
 	wp.Run()
 
-	err = wp.AddTasks([]taskType{
-		func() taskResult {
-			return taskResult{Status: StatusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: StatusSuccess, AddInfo: 12 * 356}
-		},
-		func() taskResult {
-			return taskResult{Status: StatusSuccess, AddInfo: 12 * 356}
-		},
-		func() taskResult {
-			return taskResult{Status: StatusSuccess}
-		},
-		func() taskResult {
-			return taskResult{Status: StatusFailed, AddInfo: "some error description"}
-		},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess, AddInfo: 12 * 356}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusFailed, AddInfo: "some error description"}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-		//func() taskResult {
-		//	return taskResult{Status: StatusSuccess}
-		//},
-	}...)
+	var tasks []taskType
+	for i := 1; i <= 2; i++ {
+		x := i
+		tasks = append(tasks, func() taskResult {
+			return taskResult{Status: StatusSuccess, AddInfo: x}
+		})
+	}
+
+	tasks = append(tasks, func() taskResult {
+		return taskResult{Status: StatusFailed, AddInfo: "error"}
+	})
+
+	err := wp.AddTasks(tasks...)
 	if err != nil {
 		log.Fatal("failed to add tasks: ", err)
 	}
@@ -212,7 +173,7 @@ ll:
 	for {
 		select {
 		case l := <-wp.Result():
-			fmt.Println(l, wp.workload.Load())
+			fmt.Println(l, runtime.NumGoroutine())
 
 			if l.Status == 2 {
 				break ll
@@ -226,8 +187,5 @@ ll:
 	}
 
 	time.Sleep(1 * time.Second)
-
-	//fmt.Println(wp.workload.Load())
-	//time.Sleep(1 * time.Second)
-	//fmt.Println(wp.workload.Load())
+	fmt.Println(wp.workload.Load(), runtime.NumGoroutine())
 }
