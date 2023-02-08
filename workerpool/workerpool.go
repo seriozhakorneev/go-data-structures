@@ -1,11 +1,9 @@
-// package workerpool
-package main
+package workerpool
 
 import (
 	"context"
 	"fmt"
 	"log"
-	"runtime"
 	"sync"
 	"sync/atomic"
 )
@@ -43,20 +41,17 @@ type taskResult struct {
 	AddInfo interface{}
 }
 
-// New - returns *workerPool with provided count of workers.
-// If workers count of workers not provided it will be set to runtime.NumCPU()-1.
-func New(workers ...int) *WorkerPool {
+// New - returns *workerPool with provided count of workers, channels buffer.
+// If buffer not provided, channels will be non-buffered.
+func New(workers int, buffer ...int) *WorkerPool {
+	e, r := make(chan taskType), make(chan taskResult)
 
-	if len(workers) < 1 {
-		// set default workers count
-		workers = append(workers, runtime.NumCPU()-1)
+	if len(buffer) > 1 {
+		e = make(chan taskType, buffer[0])
+		r = make(chan taskResult, buffer[0])
 	}
 
-	return &WorkerPool{
-		wCount:   workers[0],
-		executeC: make(chan taskType),
-		resultsC: make(chan taskResult),
-	}
+	return &WorkerPool{wCount: workers, executeC: e, resultsC: r}
 }
 
 // Run - runs background workers(goroutines).Count of workers depends
@@ -67,8 +62,8 @@ func (wp *WorkerPool) Run() {
 	ctx, wp.cancel = context.WithCancel(ctx)
 
 	wp.Once.Do(func() {
-		log.Printf("Pool started with %d workers\n", wp.wCount)
 		wp.startPool(ctx)
+		log.Printf("Pool started with %d workers\n", wp.wCount)
 	})
 }
 
@@ -94,27 +89,14 @@ func (wp *WorkerPool) startPool(ctx context.Context) {
 	}
 }
 
-// AddTasks - sending tasks to workers through executeC channel,
-// if sends more than one, for better performance, should be sent as slice,
-// not for loop with repeatedly calling AddTasks.
-func (wp *WorkerPool) AddTasks(tasks ...taskType) (err error) {
-	err = fmt.Errorf("failed to add zero tasks")
-
-	for _, task := range tasks {
-		if task == nil {
-			return fmt.Errorf("failed to add <nil> task")
-		}
-		err = nil
-	}
-
-	if err != nil {
-		return err
+// AddTask - sending task to workers through executeC channel.
+func (wp *WorkerPool) AddTask(tasks taskType) (err error) {
+	if tasks == nil {
+		return fmt.Errorf("failed to add <nil> task")
 	}
 
 	go func() {
-		for _, task := range tasks {
-			wp.executeC <- task
-		}
+		wp.executeC <- tasks
 	}()
 
 	return nil
