@@ -22,19 +22,20 @@ type WorkerPool struct {
 
 	// wCount - count of workers.
 	wCount int
-	// workload - stores the boolean value of workload of workers.
+	// workload - stores the boolean value of workers workload.
+	// needed for synchronization.
 	workload atomic.Bool
 	// executeC - a queue channel that delivers tasks to workers.
-	executeC chan taskType
+	executeC chan DefaultTaskType
 	// resultsC - data collection channel from executed workers.
-	resultsC chan taskResult
+	resultsC chan DefaultTaskResult
 }
 
-// taskType - default task type.
-type taskType func() taskResult
+// DefaultTaskType - default task type.
+type DefaultTaskType func() DefaultTaskResult
 
-// taskResult - task execution result.
-type taskResult struct {
+// DefaultTaskResult - task execution result.
+type DefaultTaskResult struct {
 	// Status - task status at the end of execution.
 	Status int
 	// AddInfo - additional information field.
@@ -43,20 +44,23 @@ type taskResult struct {
 
 // New - returns *workerPool with provided count of workers, channels buffer.
 // If buffer not provided, channels will be non-buffered.
-func New(workers int, buffer ...int) *WorkerPool {
-	e, r := make(chan taskType), make(chan taskResult)
-
-	if len(buffer) > 1 {
-		e = make(chan taskType, buffer[0])
-		r = make(chan taskResult, buffer[0])
+func New(workers int, buffer ...int) (*WorkerPool, error) {
+	if workers < 1 {
+		return nil, fmt.Errorf("minimum workers count: 1, got: %d", workers)
 	}
 
-	return &WorkerPool{wCount: workers, executeC: e, resultsC: r}
+	e, r := make(chan DefaultTaskType), make(chan DefaultTaskResult)
+	if len(buffer) > 1 {
+		e = make(chan DefaultTaskType, buffer[0])
+		r = make(chan DefaultTaskResult, buffer[0])
+	}
+
+	return &WorkerPool{wCount: workers, executeC: e, resultsC: r}, nil
 }
 
-// Run - runs background workers(goroutines).Count of workers depends
-// on workers count field wCount, provided in New. Every worker
-// takes task, execute and write result via writeResult.
+// Run - runs background workers(goroutines).
+// Count of workers depends on field wCount, provided in New.
+// Every worker takes task, execute and write result via writeResult.
 func (wp *WorkerPool) Run() {
 	ctx := context.Background()
 	ctx, wp.cancel = context.WithCancel(ctx)
@@ -90,7 +94,7 @@ func (wp *WorkerPool) startPool(ctx context.Context) {
 }
 
 // AddTask - sending task to workers through executeC channel.
-func (wp *WorkerPool) AddTask(tasks taskType) (err error) {
+func (wp *WorkerPool) AddTask(tasks DefaultTaskType) (err error) {
 	if tasks == nil {
 		return fmt.Errorf("failed to add <nil> task")
 	}
@@ -103,12 +107,12 @@ func (wp *WorkerPool) AddTask(tasks taskType) (err error) {
 }
 
 // writeResult - writes result to resultsC channel.
-func (wp *WorkerPool) writeResult(result taskResult) {
+func (wp *WorkerPool) writeResult(result DefaultTaskResult) {
 	wp.resultsC <- result
 }
 
 // Result - returns results channel.
-func (wp *WorkerPool) Result() chan taskResult {
+func (wp *WorkerPool) Result() chan DefaultTaskResult {
 	return wp.resultsC
 }
 
@@ -120,7 +124,7 @@ func (wp *WorkerPool) Loaded() bool {
 // Stop - closing all workers in worker pool, if they are not work loaded.
 func (wp *WorkerPool) Stop() error {
 	if wp.Loaded() {
-		return fmt.Errorf("some tasks are in process")
+		return fmt.Errorf("tasks are in process")
 	}
 
 	wp.cancel()
