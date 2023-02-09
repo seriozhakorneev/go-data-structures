@@ -94,13 +94,13 @@ func (wp *WorkerPool) startPool(ctx context.Context) {
 }
 
 // AddTask - sending task to workers through executeC channel.
-func (wp *WorkerPool) AddTask(tasks DefaultTaskType) (err error) {
-	if tasks == nil {
+func (wp *WorkerPool) AddTask(task DefaultTaskType) (err error) {
+	if task == nil {
 		return fmt.Errorf("failed to add <nil> task")
 	}
 
 	go func() {
-		wp.executeC <- tasks
+		wp.executeC <- task
 	}()
 
 	return nil

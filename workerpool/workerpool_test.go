@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	taskCount        = 10
+	taskCount        = 20
 	taskExecDuration = 1 * time.Second
 
-	minWCount = 2
-	maxWCount = 10
+	minWCount = 100
+	maxWCount = 100
 )
 
 func BenchmarkWP(b *testing.B) {
